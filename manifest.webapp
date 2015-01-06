@@ -1,0 +1,13 @@
+{
+  "name": "CopyPaste Test",
+  "description": "Test apps for copy paste",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "Morris Tseng",
+    "url": "https://github.com/mephisto41/test-copypaste-app.git"
+  },
+  "default_locale": "en-US",
+  "icons": {
+    "128": "/style/icons/Blank.png"
+  }
+}
