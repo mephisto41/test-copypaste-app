@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>WebGL in OffscreenCanvas</title>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+<script src="/tests/SimpleTest/SimpleTest.js"></script>
+<link rel="stylesheet" href="/tests/SimpleTest/test.css">
+</head>
+<body>
+<canvas id="c" width="64" height="64"></canvas>
+<a href="index.html">Index</a>
+<div id="info"></div>
+<script>
+
+SimpleTest.waitForExplicitFinish();
+
+function runTest() {
+
+  var htmlCanvas = document.getElementById("c");
+  var worker = new Worker("js/offscreencanvas.js");
+
+  worker.onmessage = function(evt) {
+    var msg = evt.data || {};
+    if (msg.type == "test") {
+      ok(msg.result, msg.name);
+    }
+    if (msg.type == "finish") {
+      worker.terminate();
+      SimpleTest.finish();
+    }
+  }
+
+  var offscreenCanvas = htmlCanvas.transferControlToOffscreen();
+  worker.postMessage({test: 'webgl_changesize', canvas: offscreenCanvas}, [offscreenCanvas]);
+}
+
+SpecialPowers.pushPrefEnv({'set': [
+  ['gfx.offscreencanvas.enabled', true],
+  ['webgl.force-enabled', true],
+]}, runTest);
+
+</script>
+</body>
+</html>

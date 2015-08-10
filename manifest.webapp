@@ -1,10 +1,9 @@
 {
-  "name": "CopyPaste Test",
-  "description": "Test apps for copy paste",
+  "name": "workercanvas",
+  "description": "workercanvas",
   "launch_path": "/index.html",
   "developer": {
-    "name": "Morris Tseng",
-    "url": "https://github.com/mephisto41/test-copypaste-app.git"
+    "name": "Morris Tseng"
   },
   "default_locale": "en-US",
   "icons": {

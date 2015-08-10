@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>WebGL in OffscreenCanvas</title>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+<script src="/tests/SimpleTest/SimpleTest.js"></script>
+<link rel="stylesheet" href="/tests/SimpleTest/test.css">
+</head>
+<body>
+<div><canvas id="c1" width="64" height="64"></canvas></div>
+<div><canvas id="c2" width="64" height="64"></canvas></div>
+<div><canvas id="c3" width="64" height="64"></canvas></div>
+<div><canvas id="c4" width="64" height="64"></canvas></div>
+<div><canvas id="c5" width="64" height="64"></canvas></div>
+<div><canvas id="c6" width="64" height="64"></canvas></div>
+<div><canvas id="c7" width="64" height="64"></canvas></div>
+<div><canvas id="c8" width="64" height="64"></canvas></div>
+<a href="index.html">Index</a>
+<div id="info"></div>
+<script>
+
+SimpleTest.waitForExplicitFinish();
+
+function runTest() {
+
+  var stillRunning = 0;
+
+  var startWorker = function(canvas, test) {
+
+    stillRunning++;
+    var worker = new Worker("js/offscreencanvas.js");
+
+    worker.onmessage = function(evt) {
+      var msg = evt.data || {};
+      if (msg.type == "test") {
+        ok(msg.result, msg.name);
+      }
+      if (msg.type == "finish") {
+        worker.terminate();
+        if (--stillRunning == 0)
+          SimpleTest.finish();
+      }
+    }
+
+    var offscreenCanvas = htmlCanvas.transferControlToOffscreen();
+    worker.postMessage({test: test, canvas: offscreenCanvas}, [offscreenCanvas]);
+  }
+
+  /* create 4 workers that do the regular drawing test and 4 workers
+     that do the size change test */
+  for (var i = 1; i < 9; i++) {
+    var htmlCanvas = document.getElementById("c" + i);
+    startWorker(htmlCanvas, i % 2 == 0 ? 'webgl' : 'webgl_changesize');
+  }
+}
+
+SpecialPowers.pushPrefEnv({'set': [
+  ['gfx.offscreencanvas.enabled', true],
+  ['webgl.force-enabled', true],
+  ['webgl.disable-angle', true]
+]}, runTest);
+
+</script>
+</body>
+</html>

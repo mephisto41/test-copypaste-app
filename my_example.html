@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+</head>
+<body>
+<script>
+var myWorker;
+document.addEventListener('DOMContentLoaded', function() {
+  var r = 1.0;
+  var g = 0.0;
+  var b = 0.5;
+  function drawScene(glContext) {
+    glContext.clear(glContext.COLOR_BUFFER_BIT | glContext.DEPTH_BUFFER_BIT);
+    glContext.clearColor(r > 1 ? 2 - r : r, 
+                  g > 1 ? 2 - g : g, 
+                  b > 1 ? 2 - b : b, 
+                  1.0);
+
+    r += 0.1;
+    if (r > 2) {
+      r -= 2;
+    }
+
+    g += 0.1;
+    if (g > 2) {
+      g -= 2;
+    }
+
+    b += 0.1;
+    if (b > 2) {
+      b -= 2;
+    }
+  }
+
+  //reference test case
+  /*var c0 = document.getElementById('myCanvas');
+  var gl = c0.getContext("webgl");
+  function drawScene1() {
+    drawScene(gl);
+    requestAnimationFrame(drawScene1);
+  } 
+  requestAnimationFrame(drawScene1);*/
+
+  //test case for step 1
+  //var can = new WorkerCanvas(256, 256);
+  //var gl = can.getContext("webgl");
+  //console.log("WorkerCanvas-step1 pass");
+
+  //test case for step 2
+  /*var c=document.getElementById('myCanvas');
+  var can2 = c.transferControlToProxy();
+  var gl2 = can2.getContext("webgl");
+  function drawScene2() {
+    drawScene(gl2);
+    can2.commit();
+    requestAnimationFrame(drawScene2);
+  } 
+  requestAnimationFrame(drawScene2);
+  console.log("WorkerCanvas-step2 pass");*/
+
+  //var myWorker = new Worker("my_task.js");
+  /*myWorker = new Worker("gl_worker.js");
+  myWorker.onmessage = function (oEvent) {
+    //alert(oEvent.data);
+    dump("from worker: " + oEvent.data + "\n");
+    //console.log("Called back by the worker!\n");
+  };
+
+  var c=document.getElementById('myCanvas');
+  var can2 = c.transferControlToOffscreen();
+  dump("typeof can2:" + typeof(can2.getContext) + "\n");
+  for(var key in can2) {
+    dump("MMMMMMMMMMMMMMMMMMMMMM key:" + key + "\n");
+  }
+  myWorker.postMessage({canvas: can2}, [can2]);*/
+});
+
+start = function() {
+  myWorker = new Worker("js/gl_worker.js");
+  myWorker.onmessage = function (oEvent) {
+    //alert(oEvent.data);
+    dump("from worker: " + oEvent.data + "\n");
+    //console.log("Called back by the worker!\n");
+  };
+
+  var c=document.getElementById('myCanvas');
+  var can2 = c.transferControlToOffscreen();
+  /*var ab = new ArrayBuffer(1);
+  myWorker.postMessage(ab, [ab]);*/
+  dump("typeof can2:" + typeof(can2.getContext) + "\n");
+  for(var key in can2) {
+    dump("MMMMMMMMMMMMMMMMMMMMMM key:" + key + "\n");
+  }
+  myWorker.postMessage({canvas: can2}, [can2]);
+}
+
+changeCanvasSize = function() {
+  //var c=document.getElementById('myCanvas');
+  //c.width /= 2;
+  //c.height /= 2;
+
+  myWorker.postMessage("change");
+}
+</script>
+
+<canvas id="myCanvas" width=500 height=500 style="transform:translateZ(1px);"></canvas>
+<a href="javascript:changeCanvasSize()">resize</a>
+<a href="javascript:start()">start</a>
+<a href="index.html">Index</a>
+</body>
+</html> 
